@@ -24,7 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/textview1"
+        android:layout_below="@+id/txtMode"
         android:text="distance"
         android:textSize="24sp" />
 
@@ -55,39 +55,13 @@
         android:textSize="24sp" />
 
     <TextView
-        android:id="@+id/textview1"
+        android:id="@+id/txtMode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/map"
         android:text="DRIVING MODE"
         android:textSize="24sp" />
-
-    <RadioGroup
-        android:id="@+id/radiogroup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:orientation="horizontal">
-
-        <RadioButton
-            android:id="@+id/Direct_Driving"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignStart="@+id/textView"
-            android:layout_marginBottom="15dp"
-            android:text="Driving" />
-
-        <RadioButton
-            android:id="@+id/Direction_Walking"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignStart="@+id/textView_result2"
-            android:layout_alignTop="@+id/Direct_Driving"
-            android:text="Walking" />
-    </RadioGroup>
 
     <Button
         android:id="@+id/btnWalking"
@@ -99,7 +73,7 @@
         android:text="walking" />
 
     <Button
-        android:id="@+id/btnDriving"
+        android:id="@+id/btnTransit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/btnWalking"
@@ -113,5 +87,13 @@
         android:layout_alignParentEnd="true"
         android:layout_below="@+id/map"
         android:text="Routes_Detail" />
+
+    <Button
+        android:id="@+id/btnDriving"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignStart="@+id/textView_result2"
+        android:text="Driving" />
 
 </RelativeLayout>

@@ -60,6 +60,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Button WALKING, DRIVING,TRANSIT;
     private Button mbtnRoutes_Detail;
     String[] routes_detail_array;
+    private TextView mtxtMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +69,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        mtxtMode=(TextView)findViewById(R.id.txtMode);
+
         listPoints=new ArrayList<>();
         tv_result1= (TextView) findViewById(R.id.textView_result1);
         tv_result2=(TextView) findViewById(R.id.textView_result2);
@@ -76,11 +80,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         DRIVING= (Button) findViewById(R.id.btnDriving);
         WALKING= (Button) findViewById(R.id.btnWalking);
-        //TRANSIT= (Button) findViewById(R.id.transit);
+        TRANSIT= (Button) findViewById(R.id.btnTransit);
         DRIVING.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mode="mode=transit";
+                mode="mode=driving";
                 mMap.clear();
                 mMap.addMarker(new MarkerOptions().position(location1).flat(true));//然後就把剛剛建立好的LatLng物件放進去currentMarker
                 //String la=String.valueOf(strLocation_Lat);
@@ -97,6 +101,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 url = getRequestUrl(location1,location2);
                 TaskRequestDirections taskRequestDirections=new TaskRequestDirections();
                 taskRequestDirections.execute(url);
+                mtxtMode.setText("Driving Mode");
             }
         });
         WALKING.setOnClickListener(new View.OnClickListener() {
@@ -117,9 +122,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 url = getRequestUrl(location1,location2);
                 TaskRequestDirections taskRequestDirections2=new TaskRequestDirections();
                 taskRequestDirections2.execute(url);
+                mtxtMode.setText("Walking Mode");
             }
         });
-        /*TRANSIT.setOnClickListener(new View.OnClickListener() {
+        TRANSIT.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mode="mode=transit";
@@ -139,8 +145,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 url = getRequestUrl(location1,location2);
                 TaskRequestDirections taskRequestDirections=new TaskRequestDirections();
                 taskRequestDirections.execute(url);
+                mtxtMode.setText("Trasnsit Mode");
             }
-        });*/
+        });
         mbtnRoutes_Detail=(Button)findViewById(R.id.btnRoutes_Detail);
         mbtnRoutes_Detail.setOnClickListener(new View.OnClickListener() {
             @Override
