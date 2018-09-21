@@ -68,24 +68,25 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="88dp"
+        android:layout_centerHorizontal="true"
         android:text="walking" />
 
     <Button
         android:id="@+id/btnTransit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/btnWalking"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
+        android:layout_marginEnd="43dp"
         android:text="transit" />
 
     <Button
         android:id="@+id/btnRoutes_Detail"
         android:layout_width="105dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_below="@+id/map"
+        android:layout_alignEnd="@+id/map"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="63dp"
         android:text="Routes_Detail" />
 
     <Button
@@ -93,7 +94,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignStart="@+id/textView_result2"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="43dp"
         android:text="Driving" />
 
 </RelativeLayout>

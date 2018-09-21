@@ -12,8 +12,12 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -54,14 +58,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     ArrayList<LatLng> listPoints;
     TextView tv_result1,tv_result2;
     private static final  double EARTH_RADIUS = 6378137;
-    private String mode, url;
+    private String url;
     private LatLng location1, location2;
     private Double strLocation_Lat, strLocation_Lat2, strLocation_Lng, strLocation_Lng2;
     private Button WALKING, DRIVING,TRANSIT;
     private Button mbtnRoutes_Detail;
     String[] routes_detail_array;
     private TextView mtxtMode;
-
+    private String mode="mode=driving";
+    public static int RouteMethod = 0;
+    private List<Transit_Get> RouteMethod_list = new ArrayList<Transit_Get>();
+    public static int AlertDialog_Height, AlertDialog_Width;
+    private AlertDialog mAlertDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,10 +93,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View v) {
                 mode="mode=driving";
+                RouteMethod = 0;
                 mMap.clear();
-                mMap.addMarker(new MarkerOptions().position(location1).flat(true));//然後就把剛剛建立好的LatLng物件放進去currentMarker
-                //String la=String.valueOf(strLocation_Lat);
-                //String lo= String.valueOf(strLocation_Lng);
+                mMap.addMarker(new MarkerOptions().position(location1).flat(true));
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(location1));
                 location2 = new LatLng(strLocation_Lat2, strLocation_Lng2);
                 mMap.addMarker(new MarkerOptions().position(location2));
@@ -108,8 +115,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View v) {
                 mode="mode=walking";
+                RouteMethod = 0;
                 mMap.clear();
-                mMap.addMarker(new MarkerOptions().position(location1).flat(true));//然後就把剛剛建立好的LatLng物件放進去currentMarker
+                mMap.addMarker(new MarkerOptions().position(location1).flat(true));
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(location1));
                 location2 = new LatLng(strLocation_Lat2, strLocation_Lng2);
                 mMap.addMarker(new MarkerOptions().position(location2));
@@ -128,45 +136,83 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         TRANSIT.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 mode="mode=transit";
-                mMap.clear();
-                mMap.addMarker(new MarkerOptions().position(location1).flat(true));//然後就把剛剛建立好的LatLng物件放進去currentMarker
-                //String la=String.valueOf(strLocation_Lat);
-                //String lo= String.valueOf(strLocation_Lng);
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(location1));
-                location2 = new LatLng(strLocation_Lat2, strLocation_Lng2);
-                mMap.addMarker(new MarkerOptions().position(location2));
-                CameraPosition cameraPosition = new CameraPosition.Builder()
-                        .target(location2)              // Sets the center of the map to ZINTUN
-                        .zoom(11)                   // Sets the zoom// Sets the orientation of the camera to east
-                        .tilt(90)                   // Sets the tilt of the camera to 30 degrees
-                        .build();                   // Creates a CameraPosition from the builder
-                mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-                url = getRequestUrl(location1,location2);
+
                 TaskRequestDirections taskRequestDirections=new TaskRequestDirections();
                 taskRequestDirections.execute(url);
-                mtxtMode.setText("Trasnsit Mode");
+
+                //為了解決重複抓值，所以每次都直接清空陣列，重新放進去
+                if(RouteMethod_list!=null){
+                   RouteMethod_list.clear();
+                }
+                for(int i=0; i<DirectionsParser.jRoute_Length; i++){
+                    RouteMethod_list.add(new Transit_Get(i,"第"+(i+1)+"種方法"));
+                }
+
+                mAlertDialog = new AlertDialog.Builder(MapsActivity.this).create();
+                final View item = LayoutInflater.from(MapsActivity.this).inflate(R.layout.alertdialog_recyclerview, null);
+                RecyclerView recyclerView = (RecyclerView)item.findViewById(R.id.RouteMethod_Reyclerview);
+                recyclerView.setLayoutManager(new LinearLayoutManager(MapsActivity.this));
+                recyclerView.addItemDecoration(new DividerItemDecoration(MapsActivity.this, DividerItemDecoration.VERTICAL));
+                mAlertDialog.setView(item);
+                mAlertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                    @Override
+                    public void onShow(DialogInterface dialog) {
+                        AlertDialog_Height=item.getHeight();
+                        AlertDialog_Width=item.getWidth();
+                        Log.d("test dialog height", String.valueOf(AlertDialog_Height)+" "+String.valueOf(AlertDialog_Width));
+                    }
+                });
+                Transit_Adapter adapter =new Transit_Adapter(RouteMethod_list,MapsActivity.this);
+                //recyclerView.setAdapter(adapter);
+                adapter.setOnItemClickListener(new Transit_Adapter.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+                        RouteMethod=(RouteMethod_list.get(position).getId())*2;
+                        Log.d("test id", String.valueOf(RouteMethod));
+                        mMap.clear();
+                        mMap.addMarker(new MarkerOptions().position(location1).flat(true));
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(location1));
+                        location2 = new LatLng(strLocation_Lat2, strLocation_Lng2);
+                        mMap.addMarker(new MarkerOptions().position(location2));
+                        CameraPosition cameraPosition = new CameraPosition.Builder()
+                                .target(location2)              // Sets the center of the map to ZINTUN
+                                .zoom(11)                   // Sets the zoom// Sets the orientation of the camera to east
+                                .tilt(90)                   // Sets the tilt of the camera to 30 degrees
+                                .build();                   // Creates a CameraPosition from the builder
+                        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                        url = getRequestUrl(location1,location2);
+                        TaskRequestDirections taskRequestDirections=new TaskRequestDirections();
+                        taskRequestDirections.execute(url);
+                        mtxtMode.setText("Trasnsit Mode" +" "+"第"+(RouteMethod_list.get(position).getId()+1)+"種方法");
+                        mAlertDialog.hide();
+                    }
+                });
+                recyclerView.setAdapter(adapter);
+                mAlertDialog.show();
             }
         });
+
         mbtnRoutes_Detail=(Button)findViewById(R.id.btnRoutes_Detail);
         mbtnRoutes_Detail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder dialog_list=new AlertDialog.Builder(MapsActivity.this);
-                dialog_list.setTitle("詳細導航路線");
-                dialog_list.setItems(routes_detail_array, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                    AlertDialog.Builder dialog_list=new AlertDialog.Builder(MapsActivity.this);
+                    dialog_list.setTitle("詳細導航路線");
+                    dialog_list.setItems(routes_detail_array, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
 
-                    }
-                });
-                dialog_list.setNegativeButton("跳出", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                        }
+                    });
+                    dialog_list.setNegativeButton("跳出", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
 
-                    }
-                });
-                dialog_list.show();
+                        }
+                    });
+                    dialog_list.show();
             }
         });
     }
@@ -195,7 +241,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.addMarker(new MarkerOptions().position(location1).flat(true));//然後就把剛剛建立好的LatLng物件放進去currentMarker
             mMap.moveCamera(CameraUpdateFactory.newLatLng(location1));
             location2 = new LatLng(strLocation_Lat2, strLocation_Lng2);
-            mMap.addMarker(new MarkerOptions().position(location2).title("Marker in 台北信義區"));
+            mMap.addMarker(new MarkerOptions().position(location2));
             CameraPosition cameraPosition = new CameraPosition.Builder()
                     .target(location2)              // Sets the center of the map to ZINTUN
                     .zoom(11)                   // Sets the zoom// Sets the orientation of the camera to east
@@ -261,10 +307,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         return responseString;
     }
-
     @SuppressLint("MissingPermission")
-
-
 
     public class TaskRequestDirections extends AsyncTask<String,Void,String>{
         @Override
@@ -285,7 +328,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //parse json here
             TaskParser taskParser= new TaskParser();
             taskParser.execute(s);
-
         }
     }
     public class TaskParser extends AsyncTask<String,Void,List<List<HashMap<String,String>>>>{
@@ -311,15 +353,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         @Override
         protected void onPostExecute(List<List<HashMap<String, String>>> lists){
             int result_size=lists.size();
-            Log.d("result", String.valueOf(result_size)+lists);
+            Log.d("result", String.valueOf(RouteMethod)+String.valueOf(result_size)+lists);
             //get list route and display it into th map
             ArrayList points =null;
             PolylineOptions polylineOptions=null;
             ArrayList<String> html_str_array = null;
             ArrayList<String> html_transit=null;
 
-            for(int i = 0; i < lists.size(); i=i+1){
-                if(i==0){
+            for(int i = RouteMethod; i < lists.size(); i=i+1){
+                if(i==RouteMethod){
                     points = new ArrayList<LatLng>();
                     polylineOptions = new PolylineOptions();
                     // Fetching i-th route
@@ -343,7 +385,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     polylineOptions.geodesic(true);
                 }
 
-                if(i==1){
+                if(i==RouteMethod+1){
                     html_str_array = new ArrayList<String>();
                     html_transit=new ArrayList<String>();
                     List<HashMap<String, String>> html_list = lists.get(i);

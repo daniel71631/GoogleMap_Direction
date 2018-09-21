@@ -15,6 +15,8 @@ import java.util.regex.Pattern;
 
 public class DirectionsParser {
 
+    public static int jRoute_Length;
+
     /**
      * Returns a list of lists containing latitude and longitude from a JSONObject
      */
@@ -32,6 +34,7 @@ public class DirectionsParser {
 
         try {
             jRoutes = jObject.getJSONArray("routes");
+            jRoute_Length=jRoutes.length();
             Log.d("routes_length", String.valueOf(jRoutes.length()));
             // Loop for all routes
             for (int i = 0; i < jRoutes.length(); i++) {
