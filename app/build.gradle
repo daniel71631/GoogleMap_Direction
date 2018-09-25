@@ -5,12 +5,12 @@ android {
     buildToolsVersion '28.0.2'
     defaultConfig {
         applicationId "com.example.mana1.sampletest"
-        minSdkVersion 23
+        minSdkVersion 27
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        multiDexEnabled true
+
     }
     buildTypes {
         release {
