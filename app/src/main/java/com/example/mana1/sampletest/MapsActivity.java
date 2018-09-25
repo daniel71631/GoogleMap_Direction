@@ -1,8 +1,8 @@
 package com.example.mana1.sampletest;
 
+
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -12,6 +12,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -305,7 +306,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
     @SuppressLint("MissingPermission")
 
-    public class TaskRequestDirections extends AsyncTask<String,Void,String>{
+    public class TaskRequestDirections extends AsyncTask<String,Void,String> {
         @Override
         protected  String doInBackground(String... strings){
             String responseString="";
